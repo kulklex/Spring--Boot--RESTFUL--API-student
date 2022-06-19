@@ -1,26 +1,29 @@
-package com.studentservice.app.dtos;
+package com.studentservice.app.entity;
 
-import javax.validation.constraints.NotNull;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
-public class StudentDTO {
-	
-	@NotNull
+@Entity
+public class Tutor {
+
+	@Id
+	@GeneratedValue(strategy= GenerationType.AUTO)
+	private int id;
 	private String firstName;
 	private String lastName;
 	private String age;
 	private String phoneNumber;
 	private String email;
 	private String gender;
-	private String level;
-	private String department;
-	private String matricNumber;
-	private String address;
 	
-	public String getAddress() {
-		return address;
+	
+	public int getId() {
+		return id;
 	}
-	public void setAddress(String address) {
-		this.address = address;
+	public void setId(int id) {
+		this.id = id;
 	}
 	public String getFirstName() {
 		return firstName;
@@ -58,23 +61,12 @@ public class StudentDTO {
 	public void setGender(String gender) {
 		this.gender = gender;
 	}
-	public String getLevel() {
-		return level;
-	}
-	public void setLevel(String level) {
-		this.level = level;
-	}
-	public String getDepartment() {
-		return department;
-	}
-	public void setDepartment(String department) {
-		this.department = department;
-	}
-	public String getMatricNumber() {
-		return matricNumber;
-	}
-	public void setMatricNumber(String matricNumber) {
-		this.matricNumber = matricNumber;
+	
+	@Override
+	public String toString() {
+		return "Tutor [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", age=" + age
+				+ ", phoneNumber=" + phoneNumber + ", email=" + email + ", gender=" + gender
+				+ "]";
 	}
 	
 	

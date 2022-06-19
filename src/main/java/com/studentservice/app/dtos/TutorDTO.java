@@ -1,8 +1,16 @@
 package com.studentservice.app.dtos;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
-public class StudentDTO {
+public class TutorDTO {
+
+
+	@Id
+	@GeneratedValue(strategy= GenerationType.AUTO)
+	private int id;	
 	
 	@NotNull
 	private String firstName;
@@ -11,17 +19,7 @@ public class StudentDTO {
 	private String phoneNumber;
 	private String email;
 	private String gender;
-	private String level;
-	private String department;
-	private String matricNumber;
-	private String address;
 	
-	public String getAddress() {
-		return address;
-	}
-	public void setAddress(String address) {
-		this.address = address;
-	}
 	public String getFirstName() {
 		return firstName;
 	}
@@ -58,23 +56,11 @@ public class StudentDTO {
 	public void setGender(String gender) {
 		this.gender = gender;
 	}
-	public String getLevel() {
-		return level;
-	}
-	public void setLevel(String level) {
-		this.level = level;
-	}
-	public String getDepartment() {
-		return department;
-	}
-	public void setDepartment(String department) {
-		this.department = department;
-	}
-	public String getMatricNumber() {
-		return matricNumber;
-	}
-	public void setMatricNumber(String matricNumber) {
-		this.matricNumber = matricNumber;
+	
+	@Override
+	public String toString() {
+		return "TutorDTO [firstName=" + firstName + ", lastName=" + lastName + ", age=" + age + ", phoneNumber="
+				+ phoneNumber + ", email=" + email + ", gender=" + gender + ", level=" + "]";
 	}
 	
 	

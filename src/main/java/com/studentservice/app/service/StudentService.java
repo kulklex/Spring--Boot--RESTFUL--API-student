@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.studentservice.app.dtos.StuDTO;
 import com.studentservice.app.dtos.StudentDTO;
+import com.studentservice.app.entity.School;
 import com.studentservice.app.entity.Student;
 
 public interface StudentService {
@@ -21,4 +22,5 @@ public interface StudentService {
 	Student updateAge(int userID, StuDTO student);
 	Student updatelastName(int userID, StuDTO student);
 	Student updateMatricNumber(int userID, StuDTO student);
+	Student addSchool(int id, School school);
 }

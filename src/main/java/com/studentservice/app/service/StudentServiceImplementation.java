@@ -8,7 +8,10 @@ import org.springframework.stereotype.Service;
 
 import com.studentservice.app.dtos.StuDTO;
 import com.studentservice.app.dtos.StudentDTO;
+import com.studentservice.app.entity.School;
 import com.studentservice.app.entity.Student;
+import com.studentservice.app.exceptions.EmptyTextFieldsException;
+import com.studentservice.app.exceptions.ResourcesNotFoundException;
 import com.studentservice.app.repository.StudentRepository;
 
 @Service
@@ -25,7 +28,7 @@ public class StudentServiceImplementation implements StudentService {
 				studentDTO.getEmail().isEmpty() || studentDTO.getFirstName() == null || studentDTO.getFirstName().isEmpty() || studentDTO.getLastName() == null 
 				|| studentDTO.getLastName().isEmpty() || studentDTO.getMatricNumber() == null || studentDTO.getMatricNumber().isEmpty() || studentDTO.getGender() == null || studentDTO.getGender().isEmpty()
 				|| studentDTO.getLevel() == null || studentDTO.getLevel().isEmpty() || studentDTO.getPhoneNumber() == null || studentDTO.getPhoneNumber().isEmpty()) {
-				return new Student();
+				throw new EmptyTextFieldsException("Fill Up Empty Student Textfields");
 			}
 		
 		Student student = new Student();
@@ -52,7 +55,7 @@ public class StudentServiceImplementation implements StudentService {
 			student.getEmail().isEmpty() || student.getFirstName() == null || student.getFirstName().isEmpty() || student.getLastName() == null 
 			|| student.getLastName().isEmpty() || student.getMatricNumber() == null || student.getMatricNumber().isEmpty() || student.getGender() == null || student.getGender().isEmpty()
 			|| student.getLevel() == null || student.getLevel().isEmpty() || student.getPhoneNumber() == null || student.getPhoneNumber().isEmpty() || student.getId() == 0) {
-			return new Student();
+			throw new EmptyTextFieldsException("Fill up Empty Student TextFields");
 		}
 		Optional<Student> isStudent = studentRepository.findById(student.getId());
 		if (isStudent.isPresent()) {
@@ -71,7 +74,7 @@ public class StudentServiceImplementation implements StudentService {
 			return student;
 		}
 		
-		return new Student();
+		throw new ResourcesNotFoundException(student);
 	}
 
 	@Override
@@ -205,6 +208,14 @@ public class StudentServiceImplementation implements StudentService {
 			return student.get();
 		}
 		return null;
+	}
+
+	@Override
+	public Student addSchool(int id, School school) {
+		System.out.println("Adding New School");
+		Student student = studentRepository.findById(id).get();
+		student.setSchool(school);
+		return student;
 	}
 
 

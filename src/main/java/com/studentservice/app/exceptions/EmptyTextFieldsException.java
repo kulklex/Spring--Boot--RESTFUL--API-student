@@ -1,0 +1,27 @@
+package com.studentservice.app.exceptions;
+
+public class EmptyTextFieldsException extends RuntimeException{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	private String message;
+
+	public EmptyTextFieldsException(String message) {
+		super();
+		this.message = message;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+	
+	
+
+}
