@@ -8,4 +8,6 @@ import com.studentservice.app.entity.Student;
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Integer>{
 
+	Student findByFirstNameAndLastName(String firstName, String lastName);
+
 }

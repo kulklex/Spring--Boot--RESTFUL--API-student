@@ -1,10 +1,7 @@
 package com.studentservice.app.dtos;
 
-import javax.validation.constraints.NotNull;
-
 public class StudentDTO {
 	
-	@NotNull
 	private String firstName;
 	private String lastName;
 	private String age;
@@ -12,16 +9,10 @@ public class StudentDTO {
 	private String email;
 	private String gender;
 	private String level;
-	private String department;
+	private int departmentID;
 	private String matricNumber;
-	private String address;
+
 	
-	public String getAddress() {
-		return address;
-	}
-	public void setAddress(String address) {
-		this.address = address;
-	}
 	public String getFirstName() {
 		return firstName;
 	}
@@ -64,11 +55,12 @@ public class StudentDTO {
 	public void setLevel(String level) {
 		this.level = level;
 	}
-	public String getDepartment() {
-		return department;
+	
+	public int getDepartmentID() {
+		return departmentID;
 	}
-	public void setDepartment(String department) {
-		this.department = department;
+	public void setDepartmentID(int departmentID) {
+		this.departmentID = departmentID;
 	}
 	public String getMatricNumber() {
 		return matricNumber;
@@ -76,6 +68,4 @@ public class StudentDTO {
 	public void setMatricNumber(String matricNumber) {
 		this.matricNumber = matricNumber;
 	}
-	
-	
 }

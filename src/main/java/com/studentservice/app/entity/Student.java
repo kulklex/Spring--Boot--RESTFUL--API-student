@@ -5,9 +5,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToOne;
-
 
 @Entity
 public class Student {
@@ -21,15 +18,9 @@ public class Student {
 	private String email;
 	private String gender;
 	private String level;
-	private String department;
 	private String matricNumber;
-	
-	
-	@OneToOne
-	private School school;
-	
-	
-	@ManyToMany(mappedBy = "enrolledStudents")
+	private String createdDate;
+	private String departmentID;
 	
 	public int getId() {
 		return id;
@@ -79,32 +70,23 @@ public class Student {
 	public void setLevel(String level) {
 		this.level = level;
 	}
-	public String getDepartment() {
-		return department;
-	}
-	public void setDepartment(String department) {
-		this.department = department;
-	}
 	public String getMatricNumber() {
 		return matricNumber;
 	}
 	public void setMatricNumber(String matricNumber) {
 		this.matricNumber = matricNumber;
 	}
-	
-	public School getSchool() {
-		return school;
+	public String getCreatedDate() {
+		return createdDate;
 	}
-	public void setSchool(School school) {
-		this.school = school;
-	}
-	@Override
-	public String toString() {
-		return "Student [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", age=" + age
-				+ ", phoneNumber=" + phoneNumber + ", email=" + email + ", gender=" + gender + ", level=" + level
-				+ ", department=" + department + ", matricNumber=" + matricNumber + ", getId()=" + getId()
-				+ ", getFirstName()=" + "]";
+	public void setCreatedDate(String createdDate) {
+		this.createdDate = createdDate;
 	}
 	
-	
+	public String getDepartmentID() {
+		return departmentID;
+	}
+	public void setDepartmentID(String departmentID) {
+		this.departmentID = departmentID;
+	}
 }
