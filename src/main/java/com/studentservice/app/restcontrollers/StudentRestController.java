@@ -28,7 +28,7 @@ import io.swagger.v3.oas.annotations.responses.*;
 @Tag(name="Students Endpoints", description="This exposes student api endpoints")
 public class StudentRestController {
 	
-	@Autowired
+	
 	StudentService studentService;
 	
 	@PostMapping("/add")

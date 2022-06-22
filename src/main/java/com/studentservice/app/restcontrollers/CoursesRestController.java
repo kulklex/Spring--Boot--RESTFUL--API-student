@@ -22,7 +22,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name="Courses Endpoints", description="This exposes courses api endpoints")
 public class CoursesRestController {
 
-	@Autowired
+	
 	CourseService courseService;
 	
 	@PostMapping("addCourse")

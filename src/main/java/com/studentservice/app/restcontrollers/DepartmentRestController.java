@@ -22,7 +22,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name="Department Endpoints", description="This exposes department api endpoints")
 public class DepartmentRestController {
 
-	@Autowired
+	
 	DepartmentService departmentService;
 	
 	@PostMapping("addDepartment")
