@@ -10,5 +10,6 @@ import com.studentservice.app.entity.Department;
 @Repository
 public interface DepartmentRepository extends JpaRepository<Department, Integer>{
 
-
+	Department findByName(String name);
+	
 }

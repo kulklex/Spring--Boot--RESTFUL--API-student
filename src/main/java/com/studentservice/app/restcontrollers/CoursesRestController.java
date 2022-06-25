@@ -22,10 +22,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name="Courses Endpoints", description="This exposes courses api endpoints")
 public class CoursesRestController {
 
-	
+	@Autowired
 	CourseService courseService;
 	
-	@PostMapping("addCourse")
+	@PostMapping("/addCourse")
 	@Operation(summary = "Add New Course", description="This route adds a new course")
 	@ApiResponses(value = { 
 	  @ApiResponse(responseCode = "200", description = "Course Added Successfully"),
@@ -43,11 +43,12 @@ public class CoursesRestController {
 			response.setStatus("ALREADY_EXISTS");
 			response.setMessage("CourseName or CourseCode Already Exists");
 			return new ResponseEntity<>(response, HttpStatus.EXPECTATION_FAILED);
-		} else {
+		} else if (returnValue == 1){
 			response.setStatus("SUCCESS");
 			response.setPayload(returnValue);
 			response.setMessage("Course Added Successfully");
 			return new ResponseEntity<>(returnValue, HttpStatus.OK);
 		}
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 }

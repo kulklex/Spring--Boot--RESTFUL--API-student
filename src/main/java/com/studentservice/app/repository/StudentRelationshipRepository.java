@@ -12,8 +12,10 @@ public interface StudentRelationshipRepository extends JpaRepository<StudentRela
 
 	StudentRelationship findByStudentID(int studentID);
 
+	StudentRelationship findByStudentIDAndDepartmentID(int studentID, int departmentID);
+
 	List<StudentRelationship> findAllByStudentID(int studentID);
 
-	List<StudentRelationship> findByDepartmentID(int departmentID);
+	List<StudentRelationship> findAllByDepartmentID(int departmentID);
 
 }

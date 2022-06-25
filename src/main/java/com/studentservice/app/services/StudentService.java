@@ -13,12 +13,12 @@ public interface StudentService {
 	
 	int addStudent(StudentDTO studentDTO);
 	int updateStudent(StuDTO studentDTO);
-	int addStudentCourses(List<String> courseIDs, int studentID);
+	int addStudentCourses(List<String> courseIDs, int studentID, int deptID);
 	StudentRecord getStudent(int studentID);
 	List<Student> getStudentsByDepartmentID(int departmentID);
 	List<Courses> getCoursesByStudentID(int studentID);
-	int changeStudentStatus(int studentID, boolean status);
-	int paySchoolFees(int studentID);
+	int changeStudentStatus(int studentID,int deptID, boolean status);
+	int paySchoolFees(int studentID,int deptID);
 	int changeDepartment(ChangeDTO changeDTO);
 	
 }

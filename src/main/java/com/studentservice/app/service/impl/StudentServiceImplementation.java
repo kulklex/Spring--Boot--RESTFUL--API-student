@@ -1,4 +1,4 @@
-package com.studentservice.app.services.impl;
+package com.studentservice.app.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.studentservice.app.dtos.ChangeDTO;
 import com.studentservice.app.dtos.StuDTO;
@@ -23,9 +24,10 @@ import com.studentservice.app.repository.StudentRepository;
 import com.studentservice.app.services.StudentService;
 import com.studentservice.app.utils.DateUtils;
 
-public class StudentServiceImpl implements StudentService {
+@Service
+public class StudentServiceImplementation implements StudentService {
 	
-	private Logger log = LoggerFactory.getLogger(StudentServiceImpl.class);
+	private Logger log = LoggerFactory.getLogger(StudentServiceImplementation.class);
 	
 	@Autowired
 	StudentRepository studentRepository;
@@ -40,7 +42,7 @@ public class StudentServiceImpl implements StudentService {
 
 	@Override
 	public int addStudent(StudentDTO studentDTO) {
-		log.info("Add student");
+		log.info("Adding Student");
 		
 		if (studentDTO.getFirstName() == null || studentDTO.getFirstName().isEmpty() || studentDTO.getLastName() == null || studentDTO.getLastName().isEmpty()
 				|| studentDTO.getEmail() == null || studentDTO.getEmail().isEmpty() || studentDTO.getPhoneNumber() == null || studentDTO.getPhoneNumber().isEmpty()) {
@@ -67,7 +69,11 @@ public class StudentServiceImpl implements StudentService {
 			student.setPhoneNumber(studentDTO.getPhoneNumber());
 			student.setDepartmentID(""+studentDTO.getDepartmentID());
 			studentRepository.save(student);
-			
+			StudentRelationship rel = new StudentRelationship();
+			rel.setStatus(true);
+			rel.setDepartmentID(studentDTO.getDepartmentID());
+			rel.setStudentID(student.getId());
+			studentRelationshipRepository.save(rel);
 			return 1;
 		}catch(Exception e) {
 			log.error("Unable To Implement: "+e.getMessage());
@@ -79,12 +85,11 @@ public class StudentServiceImpl implements StudentService {
 	@Override
 	public int updateStudent(StuDTO studentDTO) {
 		log.info("Updating Student Record");
-		
 		try {
 			//Todo: Check If Student ID is Valid
 			Optional<Student> isStudent = studentRepository.findById(studentDTO.getStudentID());
 			if (isStudent.isPresent()) {
-				StudentRelationship studentRelationship = studentRelationshipRepository.findByStudentID(studentDTO.getStudentID());
+				StudentRelationship studentRelationship = studentRelationshipRepository.findByStudentIDAndDepartmentID(studentDTO.getStudentID(), Integer.parseInt(isStudent.get().getDepartmentID()));
 				if (studentRelationship != null) {
 					studentRelationship.setDepartmentID(Integer.parseInt(studentDTO.getDepartment()));
 					studentRelationshipRepository.save(studentRelationship);
@@ -101,7 +106,21 @@ public class StudentServiceImpl implements StudentService {
 			log.error("Unable To Implement: "+e.getMessage());
 			return 0;
 		}
-	
+	}
+
+	@Override
+	public int addStudentCourses(List<String> courseIDs, int studentID, int deptID) {
+		log.info("Adding Student Courses In Department");
+		
+			for (String id : courseIDs) {
+				StudentRelationship student = new StudentRelationship();
+				student.setCourseID(Integer.parseInt(id));
+				student.setDepartmentID(deptID);
+				student.setStudentID(studentID);
+				studentRelationshipRepository.save(student);
+			}
+			return 1;
+		
 	}
 
 	@Override
@@ -112,17 +131,20 @@ public class StudentServiceImpl implements StudentService {
 		StudentRecord record = new StudentRecord();
 		Optional<Student> isStudent = studentRepository.findById(studentID);
 		if (isStudent.isPresent()) {
+			Optional<Department> dept = deptRepository.findById(Integer.parseInt(isStudent.get().getDepartmentID()));
+			record.setDepartment(dept.get().getName() != null ? dept.get().getName() : "");
+			record.setFaculty(dept.get().getFaculty() != null ? dept.get().getFaculty() : "");
 			record.setStudent(isStudent.get());
-			Optional<Department> department = deptRepository.findById(Integer.parseInt(isStudent.get().getDepartmentID()));
-			record.setDepartment(department.get().getName());
 			List<StudentRelationship> studentRelationship = studentRelationshipRepository.findAllByStudentID(studentID);
-			if (studentRelationship.size() != 0) {
-				for (StudentRelationship rel : studentRelationship) {
-					Optional<Courses> courses = courseRepository.findById(rel.getCourseID());
-					names.add(courses.get().getCourseName());
-					record.setCourseNames(names);
+			for (StudentRelationship rel : studentRelationship) {
+				Optional<Courses> courses = courseRepository.findById(rel.getCourseID());
+				if (!courses.isPresent()) {
+					continue;
 				}
+				names.add(courses.get().getCourseName());
+				record.setCourseNames(names);
 			}
+			
 			return record;
 		}
 		return null;
@@ -130,19 +152,19 @@ public class StudentServiceImpl implements StudentService {
 
 	@Override
 	public List<Student> getStudentsByDepartmentID(int departmentID) {
-		log.info("Getting Students In A Department");
+		log.info("Fetching All Students In Department");
+		
 		List<Student> students = new ArrayList<>();
-		List<StudentRelationship> studs = studentRelationshipRepository.findByDepartmentID(departmentID);
-		if (studs.size() > 0) {
-			for (StudentRelationship rels : studs) {
-				Optional<Student> student = studentRepository.findById(rels.getStudentID());
-				if (student.isPresent()) {
-					students.add(student.get());
-				}
+		List<StudentRelationship> studentRels = studentRelationshipRepository.findAllByDepartmentID(departmentID);
+		
+		for (StudentRelationship rel : studentRels) {
+			Optional<Student> student = studentRepository.findById(rel.getStudentID());
+			if(student.isPresent()) {
+				students.add(student.get());
 			}
-			return students;
+			continue;
 		}
-		return new ArrayList<Student>();
+		return students;
 	}
 
 	@Override
@@ -156,6 +178,7 @@ public class StudentServiceImpl implements StudentService {
 				if (course.isPresent()) {
 					courses.add(course.get());
 				}
+				continue;
 			}
 			return courses;
 		}
@@ -163,21 +186,21 @@ public class StudentServiceImpl implements StudentService {
 	}
 
 	@Override
-	public int changeStudentStatus(int studentID, boolean status) {
+	public int changeStudentStatus(int studentID,int deptID, boolean status) {
 		log.info("Changing Student School Status");
 		
 		Optional<Student> student = studentRepository.findById(studentID);
 		if (student.isPresent()) {
-			StudentRelationship studentRel = studentRelationshipRepository.findByStudentID(student.get().getId());
+			StudentRelationship studentRel = studentRelationshipRepository.findByStudentIDAndDepartmentID(studentID, deptID);
 			studentRel.setStatus(status);
 			studentRelationshipRepository.save(studentRel);
 			return 1;
 		}
-		return 0;
+		return 0;	
 	}
 
 	@Override
-	public int paySchoolFees(int studentID) {
+	public int paySchoolFees(int studentID,int deptID) {
 		log.info("Pay School Fees");
 		Optional<Student> student = studentRepository.findById(studentID);
 		if (student.isPresent()) {
@@ -195,23 +218,6 @@ public class StudentServiceImpl implements StudentService {
 		return 0;
 	}
 
-	@Override
-	public int addStudentCourses(List<String> courseIDs, int studentID) {
-		log.info("Adding Student Courses");
-		
-		Optional<Student> student = studentRepository.findById(studentID);
-		if (student.isPresent()) {
-			for (String courseID : courseIDs) {
-				StudentRelationship studentRel = studentRelationshipRepository.findByStudentID(studentID);
-				if (studentRel != null) {
-					studentRel.setCourseID(Integer.parseInt(courseID));
-					studentRelationshipRepository.save(studentRel);
-				}
-				
-			}
-			return 1;
-		}
-		return 0;
-	}
+	
 
 }

@@ -28,10 +28,10 @@ import io.swagger.v3.oas.annotations.responses.*;
 @Tag(name="Students Endpoints", description="This exposes student api endpoints")
 public class StudentRestController {
 	
-	
+	@Autowired
 	StudentService studentService;
 	
-	@PostMapping("/add")
+	@PostMapping("/addStudent")
 	@Operation(summary = "Add New Student", description="This route adds new student")
 	@ApiResponses(value = { 
 	  @ApiResponse(responseCode = "200", description = "Student Added Successfully"),
@@ -52,11 +52,14 @@ public class StudentRestController {
 			response.setMessage("Student Already Exist");
 			return new ResponseEntity<>(response,HttpStatus.EXPECTATION_FAILED);
 		}
-		response.setStatus("SUCCESS");
-		response.setPayload(retValue);
-		response.setMessage("Student Added Successfully");
-		return new ResponseEntity<>(retValue, HttpStatus.OK);
+		else if (retValue == 1) {
+			response.setStatus("SUCCESS");
+			response.setPayload(retValue);
+			response.setMessage("Student Added Successfully");
+			return new ResponseEntity<>(retValue, HttpStatus.OK);
+		}
 		
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 	
 	@PostMapping("/update")
@@ -79,6 +82,31 @@ public class StudentRestController {
 			response.setStatus("SUCCESS");
 			response.setPayload(retValue);
 			response.setMessage("Student Updated Successfully");
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		}
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
+	
+	@PostMapping("/courses/add/{courseIDs}/{studentID}/{deptID}")
+	@Operation(summary = "Add Student Courses", description="This route adds student offering courses")
+	@ApiResponses(value = { 
+	  @ApiResponse(responseCode = "200", description = "Student Updated Successfully"),
+	  @ApiResponse(responseCode = "428", description = "Invalid payload supplied"),
+	  @ApiResponse(responseCode = "404", description = "Invalid ID supplied"),
+	  @ApiResponse(responseCode = "501", description = "An error occured"),
+	  @ApiResponse(responseCode = "400", description = "Bad request")})
+	public ResponseEntity<?> addStudentCourses(@PathVariable List<String> courseIDs,@PathVariable int studentID,@PathVariable int deptID){
+		int retValue = studentService.addStudentCourses(courseIDs, studentID, deptID);
+		Response response = new Response();
+		if (retValue == 2) {
+			response.setStatus("NOT_FOUND");
+			response.setMessage("Invalid Resource ID supplied");
+			return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
+		}
+		else if (retValue == 1) {
+			response.setStatus("SUCCESS");
+			response.setPayload(retValue);
+			response.setMessage("Student Courses Added Successfully");
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

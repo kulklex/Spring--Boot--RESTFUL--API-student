@@ -10,6 +10,6 @@ public interface CoursesRepository extends JpaRepository<Courses, Integer>{
 
 	Courses findByCourseNameAndCourseCode(String courseName, String courseCode);
 
-	
+	Courses findByCourseName(String courseName);
 
 }

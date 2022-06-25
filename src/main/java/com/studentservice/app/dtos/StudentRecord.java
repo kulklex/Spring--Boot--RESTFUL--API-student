@@ -9,6 +9,7 @@ public class StudentRecord {
 	private Student student;
 	private List<String> courseNames;
 	private String department;
+	private String faculty;
 	
 	public Student getStudent() {
 		return student;
@@ -27,6 +28,18 @@ public class StudentRecord {
 	}
 	public void setDepartment(String department) {
 		this.department = department;
+	}
+	/**
+	 * @return the faculty
+	 */
+	public String getFaculty() {
+		return faculty;
+	}
+	/**
+	 * @param faculty the faculty to set
+	 */
+	public void setFaculty(String faculty) {
+		this.faculty = faculty;
 	}
 	
 	
