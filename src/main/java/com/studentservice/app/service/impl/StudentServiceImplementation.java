@@ -1,7 +1,9 @@
 package com.studentservice.app.service.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -10,17 +12,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.studentservice.app.dtos.ChangeDTO;
+import com.studentservice.app.dtos.EmailConstants;
 import com.studentservice.app.dtos.StuDTO;
 import com.studentservice.app.dtos.StudentDTO;
 import com.studentservice.app.dtos.StudentRecord;
 import com.studentservice.app.entity.Courses;
 import com.studentservice.app.entity.Department;
+import com.studentservice.app.entity.Email;
 import com.studentservice.app.entity.Student;
 import com.studentservice.app.entity.StudentRelationship;
 import com.studentservice.app.repository.CoursesRepository;
 import com.studentservice.app.repository.DepartmentRepository;
 import com.studentservice.app.repository.StudentRelationshipRepository;
 import com.studentservice.app.repository.StudentRepository;
+import com.studentservice.app.services.EmailService;
 import com.studentservice.app.services.StudentService;
 import com.studentservice.app.utils.DateUtils;
 
@@ -39,6 +44,8 @@ public class StudentServiceImplementation implements StudentService {
 	StudentRelationshipRepository studentRelationshipRepository;
 	@Autowired
 	DateUtils dateUtils;
+	@Autowired
+	EmailService notification;
 
 	@Override
 	public int addStudent(StudentDTO studentDTO) {
@@ -74,6 +81,11 @@ public class StudentServiceImplementation implements StudentService {
 			rel.setDepartmentID(studentDTO.getDepartmentID());
 			rel.setStudentID(student.getId());
 			studentRelationshipRepository.save(rel);
+			
+			int retValue = this.sendHtmlWelcomeEmail(student.getEmail(), student.getFirstName() +" "+student.getLastName());
+			if (retValue == 1) {
+				return 1;
+			}
 			return 1;
 		}catch(Exception e) {
 			log.error("Unable To Implement: "+e.getMessage());
@@ -81,6 +93,23 @@ public class StudentServiceImplementation implements StudentService {
 		}
 		
 	}
+	
+	 private int sendHtmlWelcomeEmail(String email, String firstName) throws Exception {
+	      Email htmlMail = new Email();
+	      htmlMail.setFrom("Aptech");
+	      htmlMail.setFromEmail("notchcx@notchcx.io");
+	      htmlMail.setSubject("WELCOME");
+	      htmlMail.setTemplateName(EmailConstants.WELCOME_TEMPLATE);
+	      htmlMail.setTo(email);
+	      
+	      Map<String, String> templateBody = new HashMap<String, String>();
+	     
+	      templateBody.put("fullname", firstName);
+	     
+	      htmlMail.setTemplateTokens(templateBody);
+	      
+	      return notification.sendHtmlEmail(htmlMail);
+	  }
 
 	@Override
 	public int updateStudent(StuDTO studentDTO) {
@@ -127,6 +156,7 @@ public class StudentServiceImplementation implements StudentService {
 	public StudentRecord getStudent(int studentID) {
 		log.info("Getting Student Record");
 		
+		//list to add course names
 		List<String> names = new ArrayList<>();
 		StudentRecord record = new StudentRecord();
 		Optional<Student> isStudent = studentRepository.findById(studentID);
@@ -154,16 +184,8 @@ public class StudentServiceImplementation implements StudentService {
 	public List<Student> getStudentsByDepartmentID(int departmentID) {
 		log.info("Fetching All Students In Department");
 		
-		List<Student> students = new ArrayList<>();
-		List<StudentRelationship> studentRels = studentRelationshipRepository.findAllByDepartmentID(departmentID);
+		List<Student> students = studentRepository.findByDepartmentID(""+departmentID);
 		
-		for (StudentRelationship rel : studentRels) {
-			Optional<Student> student = studentRepository.findById(rel.getStudentID());
-			if(student.isPresent()) {
-				students.add(student.get());
-			}
-			continue;
-		}
 		return students;
 	}
 
@@ -205,7 +227,7 @@ public class StudentServiceImplementation implements StudentService {
 		Optional<Student> student = studentRepository.findById(studentID);
 		if (student.isPresent()) {
 			StudentRelationship studentRel = studentRelationshipRepository.findByStudentID(student.get().getId());
-			studentRel.setSchoolFeesPaid(true);;
+			studentRel.setSchoolFeesPaid(true);
 			studentRelationshipRepository.save(studentRel);
 			return 1;
 		}
